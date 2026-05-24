@@ -43,7 +43,14 @@ If your `data` folder is missing the necessary `items.faiss` and `items_meta.jso
 python scripts/build_faiss_index.py
 ```
 
-### 3. Run the Server
+### 3. Compute Metrics Locally
+Instead of relying on Kaggle for metric computation, you can evaluate the generated predictions against the ground truth locally:
+```bash
+PYTHONPATH=. uv run python scripts/compute_metrics.py
+```
+This updates `data/metrics.json` directly.
+
+### 4. Run the Server
 **Using Docker:**
 ```bash
 docker-compose up --build     # builds + runs on :8000
