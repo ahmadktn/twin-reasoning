@@ -1,22 +1,28 @@
-# frontend/Dockerfile
 FROM node:18-alpine AS build
 
 WORKDIR /app
 
-# Install dependencies
-COPY package*.json ./
-# If using pnpm, one could install it, but npm install works fine since package-lock.json is present
-RUN npm install
+# Install pnpm
+RUN npm install -g pnpm
 
-# Build the Vite app
+# Copy dependency files
+COPY package.json pnpm-lock.yaml ./
+
+# Install dependencies exactly from lockfile
+RUN pnpm install --frozen-lockfile --config.strict-peer-dependencies=false
+
+# Copy app files
 COPY . .
-RUN npm run build
 
-# Serve with Nginx
+# Build app
+RUN pnpm build
+
+# Production image
 FROM nginx:alpine
+
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Add SPA fallback configuration for React Router
+# React Router SPA fallback
 RUN echo "server { \
     listen 80; \
     location / { \
@@ -27,4 +33,5 @@ RUN echo "server { \
 }" > /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+
+CMD [\"nginx\", \"-g\", \"daemon off;\"]
