@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  backend:
+    mem_limit: 512m
+    mem_reservation: 256m
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/data      # mount exported Kaggle data
+    environment:
+      - LLM_PROVIDER=${LLM_PROVIDER:-openrouter}
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_MODEL=${LLM_MODEL:-mistralai/Mistral-7B-Instruct-v0.1}
+      - USE_LOCAL_LLM=${USE_LOCAL_LLM:-false}
+      - DATASET_PATH=data/All_Beauty.jsonl
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
