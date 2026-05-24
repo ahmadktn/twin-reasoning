@@ -47,4 +47,4 @@ if [ ! -f "/app/data/items.faiss" ] && [ -f "/app/data/meta_All_Beauty.jsonl" ];
 fi
 
 echo "Starting application..."
-exec "\$@"
+exec "$@"
